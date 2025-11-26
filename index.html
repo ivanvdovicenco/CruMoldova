@@ -303,10 +303,16 @@
       appId: "1:913901012780:web:aefc6983075e50e4000e89",
       measurementId: "G-2JYYSMTDER"
     };
+    
+    // Инициализация Firebase с обработкой ошибок
+    let db;
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getDatabase(app);
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+    }
     // -----------------------------------------------------------
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
 
     const agendaData = [
         { 
