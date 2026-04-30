@@ -590,7 +590,7 @@ const HOME = { lat:50.08700, lng:14.40750 };
 
 function PLACES() { return PLACES_DATA[currentLang]; }
 function DAYS()   { return DAYS_DATA[currentLang]; }
-function L()      { return UI[currentLang]; }
+function T()      { return UI[currentLang]; }
 
 function getCurrentDayId() {
   const now = new Date();
@@ -617,13 +617,15 @@ function mapsUrl(lat,lng,name){ return `https://maps.google.com/?q=${lat},${lng}
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function renderHeader() {
   const days = DAYS();
-  const ui = L();
+  const ui = T();
   const d = days[currentDayId];
   document.getElementById('hdr-date').textContent = ui.dates[currentDayId] + ui.cityUnit;
   document.getElementById('hdr-title').textContent = ui.appTitle;
   const dates = ['6','7','8','9','10'];
+  const monthLabel = currentLang==='ro' ? 'mai' : 'мая';
   const pills = document.getElementById('day-pills');
-  pills.innerHTML = days.map((dd,i) => `<button class="dpill${i===currentDayId?' active':''}" onclick="switchDay(${i})">${dates[i]}</button>`).join('');
+  pills.innerHTML = `<span style="font-size:10px;opacity:.55;font-weight:300;letter-spacing:.05em;align-self:center;margin-right:2px;text-transform:uppercase;">${monthLabel}</span>` +
+    days.map((dd,i) => `<button class="dpill${i===currentDayId?' active':''}" onclick="switchDay(${i})">${dates[i]}</button>`).join('');
   document.getElementById('nl-today').textContent   = ui.nav.today;
   document.getElementById('nl-map').textContent     = ui.nav.map;
   document.getElementById('nl-places').textContent  = ui.nav.places;
@@ -632,7 +634,7 @@ function renderHeader() {
 
 function renderToday() {
   const d = DAYS()[currentDayId];
-  const ui = L();
+  const ui = T();
   let html = '';
 
   html += `<div class="day-hero">
@@ -676,7 +678,7 @@ function renderToday() {
 
 function renderPlaces() {
   const d = DAYS()[currentDayId];
-  const ui = L();
+  const ui = T();
   const places = PLACES();
   let html = '';
 
@@ -729,7 +731,7 @@ function renderPlaces() {
 
 function renderScripture() {
   const d = DAYS()[currentDayId];
-  const ui = L();
+  const ui = T();
   const steps = LECTIO_STEPS[currentLang];
   let html = '';
 
@@ -810,7 +812,7 @@ function updateMapMarkers() {
 
 function showMapInfo(pid) {
   const p = PLACES()[pid];
-  const ui = L();
+  const ui = T();
   const info = document.getElementById('map-info');
   document.getElementById('map-info-name').textContent = p.icon+' '+p.name;
   document.getElementById('map-info-desc').textContent = p.desc.substring(0,120)+'...';
