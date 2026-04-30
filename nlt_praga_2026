@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Прага · NLT">
+<meta name="theme-color" content="#1d3557">
+<title>Прага · Ритрит NLT 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f0e8;--card:#fefcf8;--card2:#f0ebe0;
+  --blue:#1d3557;--blue2:#2a4a74;--blue-l:#e8eef5;--blue-ll:#f0f4f8;
+  --terra:#8b4513;--terra-l:#f5e8dc;
+  --green:#3d6b4f;--green-l:#e8f0eb;
+  --gold:#9a7415;--gold-l:#fef3dc;
+  --text:#1a1410;--t2:#5a4f42;--t3:#9a8e80;
+  --border:#ddd5c5;--border2:#c8bfaf;
+  --sh:0 2px 12px rgba(29,53,87,.10);
+  --nav:64px;--hdr:56px;
+  --r:14px;--r2:20px;
+  --ff-head:'Cormorant Garamond',Georgia,serif;
+  --ff-body:'Jost',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--ff-body);background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;font-size:15px;line-height:1.6}
+#app{display:flex;flex-direction:column;height:100dvh}
+
+/* HEADER */
+#hdr{background:var(--blue);color:#fff;padding:0 12px;height:var(--hdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+#hdr-left{display:flex;flex-direction:column}
+#hdr-date{font-size:11px;opacity:.65;font-family:var(--ff-body);font-weight:300;letter-spacing:.05em;text-transform:uppercase}
+#hdr-title{font-family:var(--ff-head);font-size:17px;font-weight:600;letter-spacing:.01em;line-height:1.2}
+#hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+#day-pills{display:flex;gap:4px}
+.dpill{padding:5px 9px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.7);background:transparent;cursor:pointer;font-family:var(--ff-body);transition:all .18s}
+.dpill.active{background:#fff;color:var(--blue);border-color:#fff;font-weight:500}
+
+/* LANG TOGGLE */
+#lang-toggle{display:flex;gap:3px}
+.lang-btn{padding:3px 8px;border-radius:12px;font-size:10px;font-weight:600;border:1.5px solid rgba(255,255,255,.35);color:rgba(255,255,255,.6);background:transparent;cursor:pointer;font-family:var(--ff-body);letter-spacing:.06em;transition:all .18s}
+.lang-btn.active{background:rgba(255,255,255,.22);color:#fff;border-color:rgba(255,255,255,.7)}
+
+/* CONTENT */
+#content{flex:1;overflow:hidden;position:relative}
+.tab{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;background:var(--bg)}
+.tab.active{display:block}
+.tab-inner{padding:16px 16px calc(var(--nav) + 20px)}
+
+/* MAP TAB */
+#tab-map{overflow:hidden}
+#map{position:absolute;inset:0;bottom:var(--nav)}
+#map-info{position:absolute;bottom:calc(var(--nav) + 12px);left:12px;right:12px;background:var(--card);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);display:none;z-index:1000}
+#map-info-name{font-family:var(--ff-head);font-size:16px;font-weight:600;color:var(--blue)}
+#map-info-desc{font-size:13px;color:var(--t2);margin-top:4px;line-height:1.5;max-height:60px;overflow:hidden}
+#map-info-actions{display:flex;gap:8px;margin-top:10px}
+.map-btn{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:var(--ff-body)}
+.map-btn.primary{background:var(--blue);color:#fff}
+.map-btn.secondary{background:var(--bg);color:var(--blue);border:1px solid var(--border)}
+#locate-btn{position:absolute;top:12px;right:12px;z-index:1000;width:42px;height:42px;border-radius:50%;background:var(--card);box-shadow:var(--sh);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}
+
+/* CARDS */
+.section-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;margin-top:20px}
+.section-label:first-child{margin-top:0}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);margin-bottom:10px;overflow:hidden;border:1px solid var(--border)}
+.card-head{padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ci-blue{background:var(--blue-l)}
+.ci-terra{background:var(--terra-l)}
+.ci-green{background:var(--green-l)}
+.ci-gold{background:var(--gold-l)}
+.card-meta{flex:1;min-width:0}
+.card-time{font-size:11px;color:var(--t3);font-weight:400;font-family:var(--ff-body);letter-spacing:.03em}
+.card-name{font-family:var(--ff-head);font-size:17px;font-weight:600;color:var(--text);line-height:1.2}
+.card-sub{font-size:13px;color:var(--t2);margin-top:3px;line-height:1.5}
+.card-body{padding:0 16px 14px;border-top:1px solid var(--border);padding-top:12px;display:none}
+.card-body.open{display:block}
+.card-desc{font-size:13.5px;color:var(--t2);line-height:1.7}
+.card-visio{background:var(--blue-ll);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:12.5px;color:var(--blue2);font-style:italic;line-height:1.6;border-left:3px solid var(--blue)}
+.card-visio::before{content:'Visio Divina · ';font-style:normal;font-weight:500;font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.7;display:block;margin-bottom:3px}
+.card-quote{font-family:var(--ff-head);font-size:15px;font-style:italic;color:var(--terra);border-left:2px solid var(--terra);padding-left:10px;margin-top:10px;line-height:1.5}
+.card-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500}
+.tag-prog{background:var(--blue-l);color:var(--blue)}
+.tag-extra{background:var(--green-l);color:var(--green)}
+.tag-food{background:var(--terra-l);color:var(--terra)}
+.card-actions{display:flex;gap:8px;margin-top:10px}
+.action-btn{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:var(--ff-body);text-decoration:none;display:inline-block}
+.action-btn.blue{background:var(--blue);color:#fff}
+.action-btn.outline{background:transparent;color:var(--blue);border:1px solid var(--border)}
+.expand-toggle{width:100%;background:none;border:none;border-top:1px solid var(--border);padding:10px 16px;font-size:12px;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--ff-body)}
+.expand-arrow{transition:transform .2s;display:inline-block}
+.expand-arrow.open{transform:rotate(180deg)}
+
+/* DAY HERO */
+.day-hero{background:var(--blue);color:#fff;border-radius:var(--r2);padding:20px 20px 18px;margin-bottom:16px;position:relative;overflow:hidden}
+.day-hero::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)}
+.hero-label{font-size:11px;opacity:.65;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-weight:400}
+.hero-title{font-family:var(--ff-head);font-size:26px;font-weight:600;line-height:1.15;margin-bottom:6px}
+.hero-theme{font-size:13px;opacity:.8;font-style:italic;font-family:var(--ff-head);line-height:1.4}
+.hero-passage{margin-top:12px;display:inline-block;background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500}
+
+/* QUESTION CARD */
+.question-card{background:var(--gold-l);border-radius:var(--r);border:1px solid #e0c88a;padding:16px;margin-bottom:16px}
+.qc-label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.qc-text{font-family:var(--ff-head);font-size:16px;color:var(--text);line-height:1.5;font-style:italic}
+
+/* TIMELINE */
+.tl-item{display:flex;gap:12px;padding:8px 0;position:relative}
+.tl-item::before{content:'';position:absolute;left:19px;top:36px;bottom:-8px;width:1px;background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid var(--border);background:var(--card);z-index:1}
+.tl-dot.active{border-color:var(--blue);background:var(--blue);font-size:18px}
+.tl-dot.done{border-color:var(--green);background:var(--green-l)}
+.tl-right{flex:1;min-width:0;padding-bottom:8px}
+.tl-time{font-size:11px;color:var(--t3);letter-spacing:.04em}
+.tl-title{font-size:15px;font-weight:500;color:var(--text);margin-top:1px}
+.tl-sub{font-size:12.5px;color:var(--t2);margin-top:2px;line-height:1.5}
+.tl-item.active .tl-title{color:var(--blue);font-weight:500}
+.tl-item.active .tl-dot{box-shadow:0 0 0 4px var(--blue-l)}
+
+/* SCRIPTURE */
+.lectio-step{background:var(--card);border-radius:var(--r);border:1px solid var(--border);margin-bottom:8px;overflow:hidden}
+.ls-head{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.ls-num{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-family:var(--ff-head);font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ls-name{font-family:var(--ff-head);font-size:16px;font-weight:600}
+.ls-sub{font-size:12px;color:var(--t3);margin-top:1px}
+.ls-body{padding:0 16px 14px;border-top:1px solid var(--border)}
+.ls-body p{font-size:13.5px;color:var(--t2);line-height:1.7;margin-top:10px}
+.ls-q{font-size:13px;color:var(--blue2);font-style:italic;margin-top:8px;padding:8px 12px;background:var(--blue-ll);border-radius:8px}
+.q-item{background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:14px 16px;margin-bottom:8px}
+.q-num{font-size:11px;font-weight:500;color:var(--terra);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.q-text{font-size:14px;color:var(--text);line-height:1.65}
+.conclusion-card{background:var(--green-l);border-radius:var(--r);border:1px solid #a8c8b4;padding:14px 16px;margin-top:4px}
+.cc-label{font-size:11px;font-weight:500;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.cc-text{font-size:13.5px;color:var(--text);line-height:1.6}
+.passage-chip{display:inline-block;background:var(--blue-l);color:var(--blue);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:500;margin:3px;font-family:var(--ff-head)}
+
+/* DISTANCE */
+.dist-badge{font-size:11px;color:var(--t3);background:var(--bg);border-radius:20px;padding:2px 8px;border:1px solid var(--border);font-weight:400}
+
+/* BOTTOM NAV */
+#nav{background:var(--card);border-top:1px solid var(--border);height:var(--nav);display:flex;align-items:stretch;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--t3);transition:color .15s;padding:0;font-family:var(--ff-body)}
+.nav-btn.active{color:var(--blue)}
+.nav-icon{font-size:20px;line-height:1}
+.nav-label{font-size:10px;font-weight:500;letter-spacing:.03em}
+
+/* UTILS */
+.mt-8{margin-top:8px}
+.no-content{text-align:center;padding:40px 20px;color:var(--t3);font-family:var(--ff-head);font-size:16px;font-style:italic}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="hdr">
+    <div id="hdr-left">
+      <div id="hdr-date"></div>
+      <div id="hdr-title">Прага · Ритрит NLT</div>
+    </div>
+    <div id="hdr-right">
+      <div id="lang-toggle">
+        <button class="lang-btn active" id="btn-ru" onclick="switchLang('ru')">RU</button>
+        <button class="lang-btn" id="btn-ro" onclick="switchLang('ro')">RO</button>
+      </div>
+      <div id="day-pills"></div>
+    </div>
+  </header>
+
+  <div id="content">
+    <div id="tab-today" class="tab active"><div class="tab-inner" id="today-inner"></div></div>
+    <div id="tab-map" class="tab">
+      <div id="map"></div>
+      <button id="locate-btn" onclick="locateUser()">📍</button>
+      <div id="map-info">
+        <div id="map-info-name"></div>
+        <div id="map-info-desc"></div>
+        <div id="map-info-actions"></div>
+      </div>
+    </div>
+    <div id="tab-places" class="tab"><div class="tab-inner" id="places-inner"></div></div>
+    <div id="tab-scripture" class="tab"><div class="tab-inner" id="scripture-inner"></div></div>
+  </div>
+
+  <nav id="nav">
+    <button class="nav-btn active" onclick="showTab('today')" id="nb-today">
+      <span class="nav-icon">📅</span><span class="nav-label" id="nl-today">Сегодня</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('map')" id="nb-map">
+      <span class="nav-icon">🗺️</span><span class="nav-label" id="nl-map">Карта</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('places')" id="nb-places">
+      <span class="nav-icon">📍</span><span class="nav-label" id="nl-places">Места</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('scripture')" id="nb-scripture">
+      <span class="nav-icon">📖</span><span class="nav-label" id="nl-scripture">Писание</span>
+    </button>
+  </nav>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── UI STRINGS ────────────────────────────────────────────────────────────────
+const UI = {
+  ru: {
+    appTitle: 'Прага · Ритрит NLT',
+    cityUnit: ' · Прага',
+    dates: ['6 мая','7 мая','8 мая','9 мая','10 мая'],
+    nav: { today:'Сегодня', map:'Карта', places:'Места', scripture:'Писание' },
+    s: {
+      schedule: 'Расписание дня',
+      placesProgram: 'Места по программе',
+      placesExtra: 'Также сегодня',
+      placesPermanent: 'Постоянно',
+      lectio: 'Lectio Divina',
+      study: 'Изучение Писания — 16:00',
+      closing: 'Три вопроса перед отъездом'
+    },
+    l: {
+      openQuestion: 'Вопрос для начала',
+      program: 'Программа',
+      extra: 'Дополнительно',
+      food: 'Еда',
+      readDesc: 'Читать описание',
+      openMap: 'Открыть на карте →',
+      openInMaps: 'Открыть в картах',
+      close: 'Закрыть',
+      question: 'Вопрос',
+      conclusion: 'Завершение',
+      lectioEnd: 'В конце каждый называет одно слово или образ, который остановил его. Не объясняйте — просто назовите.',
+      restDay: 'Сегодня — день отдыха и открытых разговоров'
+    }
+  },
+  ro: {
+    appTitle: 'Praga · Retrait NLT',
+    cityUnit: ' · Praga',
+    dates: ['6 mai','7 mai','8 mai','9 mai','10 mai'],
+    nav: { today:'Azi', map:'Hartă', places:'Locuri', scripture:'Scriptură' },
+    s: {
+      schedule: 'Programul zilei',
+      placesProgram: 'Locuri conform programului',
+      placesExtra: 'De asemenea azi',
+      placesPermanent: 'Permanent',
+      lectio: 'Lectio Divina',
+      study: 'Studiu biblic — 16:00',
+      closing: 'Trei întrebări înainte de plecare'
+    },
+    l: {
+      openQuestion: 'Întrebare de deschidere',
+      program: 'Program',
+      extra: 'Suplimentar',
+      food: 'Mâncare',
+      readDesc: 'Citește descrierea',
+      openMap: 'Deschide pe hartă →',
+      openInMaps: 'Deschide în hărți',
+      close: 'Închide',
+      question: 'Întrebare',
+      conclusion: 'Încheiere',
+      lectioEnd: 'La final, fiecare numește un cuvânt sau imagine care l-a oprit. Nu explicați — doar numiți.',
+      restDay: 'Astăzi — zi de odihnă și conversații libere'
+    }
+  }
+};
+
+// ── LECTIO STEPS TEMPLATES ────────────────────────────────────────────────────
+const LECTIO_STEPS = {
+  ru: [
+    { name: 'Lectio — Чтение', sub: 'Медленно и вдумчиво' },
+    { name: 'Meditatio — Размышление', sub: 'Погружение в смысл' },
+    { name: 'Oratio — Молитва', sub: 'Диалог с Богом' },
+    { name: 'Contemplatio — Созерцание', sub: 'Тишина перед Богом' }
+  ],
+  ro: [
+    { name: 'Lectio — Citire', sub: 'Încet și cu atenție' },
+    { name: 'Meditatio — Meditație', sub: 'Aprofundarea sensului' },
+    { name: 'Oratio — Rugăciune', sub: 'Dialog cu Dumnezeu' },
+    { name: 'Contemplatio — Contemplație', sub: 'Liniște înaintea lui Dumnezeu' }
+  ]
+};
+
+// ── PLACES DATA ───────────────────────────────────────────────────────────────
+const PLACES_DATA = {
+  ru: {
+    'home': { name:'Проживание', sub:'Dražického náměstí 10', lat:50.08700, lng:14.40750, icon:'🏠', type:'home', desc:'Ваш дом на всё время ритрита — в самом сердце Малой Страны, в 100 метрах от Карлова моста.' },
+    'charles-bridge': { name:'Карлов мост', sub:'1357–1402 · Malá Strana', lat:50.08648, lng:14.41144, icon:'🌉', type:'program', hours:'Открыт круглосуточно', desc:'Тридцать барочных скульптур святых, поставленных с XIV по XVIII век — каждая сделана конкретными руками. Карл IV строил мост как дорогу паломников: отсюда шли в Рим. На каждом камне — след чьего-то труда и чьей-то молитвы. Вечером после заката — почти пуст.', quote:'Камни, которые держатся уже 600 лет, — потому что их укладывали не для галочки.' },
+    'waldstein-garden': { name:'Вальдштейнский сад', sub:'1623 · Malá Strana', lat:50.09040, lng:14.40788, icon:'🌿', type:'extra', hours:'Пн–Пт 7:00–19:00 · Сб–Вс 9:00–19:00', desc:'Барочный сад в 5 минутах от дома — бесплатный, малолюдный утром. Полководец Валленштейн хотел сад красивее, чем у самого Пражского Града. Аллеи стриженых лип, грот с искусственными сталактитами, бронзовые скульптуры, живые павлины.', quote:'Барокко как попытка построить рай на земле. Почти получилось.' },
+    'nerudova': { name:'Нерудова улица', sub:'Malá Strana → Hrad', lat:50.08852, lng:14.39944, icon:'🚶', type:'extra', hours:'Всегда открыта', desc:'Прямой путь к Пражскому Граду — и одновременно одна из красивейших улиц города. До 1770-х дома не нумеровались: каждый имел эмблему ремесленника или торговца. Труд как идентичность — задолго до визиток.', quote:'Улица, где каждый дом подписан своей профессией.' },
+    'orloj': { name:'Орлой — Астрономические часы', sub:'1410 · Staré Město', lat:50.08702, lng:14.42071, icon:'⚙️', type:'program', hours:'Площадь открыта круглосуточно · Смена фигур — каждый час', desc:'Мастер Микулаш из Кадани строил их не как инструмент измерения, а как образ мира. Один механизм: обычное время, старочешское время, движение солнца, луны, знаки зодиака. Весь космос в одном циферблате. Каждый час скелет — memento mori — тянет за верёвку. За ним идут двенадцать апостолов.', visio:'Посмотрите на часы как на попытку вместить весь мир — время, небо, смерть, воскресение — в один образ. Что это говорит о человеке, который это создал?', quote:'Люди строили это не чтобы измерять время. Они искали смысл в устройстве мира.' },
+    'tyn-church': { name:'Тынская церковь', sub:'XIV в. · Staré Město', lat:50.08775, lng:14.42254, icon:'⛪', type:'extra', hours:'Вт–Сб 10:00–13:00 и 15:00–17:00 · Вс 10:00–12:00', desc:'Двойные готические шпили 80 метров — доминанта Старого города с XIV века. В XV веке — главная гуситская церковь Европы, реформация за 100 лет до Лютера. У главного алтаря покоится Тихо Браге, датский астроном, всю жизнь смотревший на звёзды.', quote:'Место, где небо и бунт жили в одном здании.' },
+    'st-vitus': { name:'Собор Святого Вита', sub:'1344–1929 · Hradčany', lat:50.09089, lng:14.40051, icon:'⛪', type:'program', hours:'Пн–Сб 9:00–16:00 · Вс 12:00–16:00', desc:'Карл IV заложил первый камень в 1344 году. Последний поставили в 1929-м — через 585 лет. Поколения мастеров работали, зная, что не доживут до конца. Архитектор Петер Парлер поместил свой скульптурный автопортрет в трифорий — в один ряд с королями. Вся готика — ради одного: Бог есть свет.', visio:'Найдите одну деталь — луч света, лицо на витраже, линию камня — и смотрите на неё как на труд конкретного человека. Что этот человек говорит о Боге через свои руки?', quote:'Великие вещи рождаются не из спешки, а из верности, которая длится дольше одной жизни.' },
+    'kafka-museum': { name:'Музей Франца Кафки', sub:'Malá Strana · 3 мин от дома', lat:50.08832, lng:14.41014, icon:'✍️', type:'extra', hours:'Ежедневно 10:00–18:00', desc:'Кафка работал страховым агентом днём и писал ночью — всю жизнь. Он так и не смог примирить эти два мира: труд-ради-жизни и труд-ради-смысла. Лабиринтная экспозиция, тени, фрагменты рукописей, атмосфера тревоги и поиска.', quote:'Человек, которому суета открылась изнутри — и который не смог её принять.' },
+    'strahov-library': { name:'Страговская библиотека', sub:'XII в. · Hradčany', lat:50.08635, lng:14.38870, icon:'📚', type:'extra', hours:'Ежедневно 9:00–17:00', desc:'Теологический зал — 1679 год, расписные своды, глобусы, тысячи кожаных корешков. Философский зал — потолок с фреской «Путь человека к истине», 18 метров высотой. Монахи собирали книги веками как завет для тех, кто придёт после.', quote:'Труд над знанием, у которого нет конца — и монахи знали это лучше всех.' },
+    'loreta': { name:'Лорета', sub:'1626 · Hradčany', lat:50.08924, lng:14.39151, icon:'⛪', type:'program', hours:'Ежедневно 10:00–17:00', desc:'В центре — Святая хижина (Santa Casa): точная копия скромного дома из Назарета, где произошло Боговоплощение. Маленькая, простая, почти бедная. Вокруг неё — барочные клуатры. Рядом — сокровищница: монстранция, усыпанная 6 222 бриллиантами. Почти все — пожертвования.', visio:'Войдите сначала к Хижине. Потом — в сокровищницу. Не торопитесь. Что вы чувствуете в каждом из этих пространств?', quote:'Предельная простота и колоссальная слава — и ни одна из них не отменяет другую.' },
+    'sternberg': { name:'Штернберкский дворец', sub:'Нацгалерея · Hradčany', lat:50.09037, lng:14.39667, icon:'🎨', type:'program', hours:'Вт–Вс 10:00–18:00 (Пн — закрыто)', desc:'Здесь хранится картина Лукаса Кранаха Старшего «Закон и Благодать» (~1529). Кранах был другом Лютера и писал живопись как богословие. Полотно разделено деревом: сухим — со стороны Закона, зелёным — со стороны Благодати.', visio:'Смотрите сначала на левую сторону — долго. Потом переведите взгляд направо. Что происходит внутри при этом переходе?', quote:'Вопрос не в том, что мы делаем. А в том, на чём мы стоим.' },
+    'charles-square': { name:'Карлова площадь', sub:'1348 · Nové Město', lat:50.07575, lng:14.41994, icon:'🏛️', type:'program', hours:'Всегда открыта', desc:'Карл IV строил Новый город по средневековым картам библейского Иерусалима. Карлова площадь — его символический центр. Он буквально пытался построить «Новый Иерусалим» — город, готовый к возвращению Христа. Здесь проходили рынки, казни, крестные шествия — вся сложность жизни.', visio:'Встаньте в центре. Оглянитесь. Этот город строили люди, которые ждали Христа. Что чувствуете вы?', quote:'Люди всегда строят с надеждой. Иногда — не зная об этом.' },
+    'old-new-synagogue': { name:'Старо-Новая синагога', sub:'1270 · Josefov', lat:50.09007, lng:14.41860, icon:'🕍', type:'extra', hours:'Пн–Пт 9:00–17:00 · Вс 9:00–17:00 (Сб — закрыто)', desc:'Старейшая действующая синагога Европы — с 1270 года. По легенде, на чердаке лежит прах Голема — глиняного великана, созданного раввином Лёвом. Голем работал без устали — без субботы, без отдыха, без Творца внутри. Существо без покоя стало опасным.', quote:'Труд без Бога становится Големом. Сильным — и разрушительным.' },
+    'old-jewish-cemetery': { name:'Старое еврейское кладбище', sub:'XV–XVIII вв. · Josefov', lat:50.08948, lng:14.41744, icon:'🪦', type:'extra', hours:'Пн–Пт 9:00–16:30 · Вс 9:00–16:30 (Сб — закрыто)', desc:'Евреям запрещали владеть землёй за пределами гетто — поэтому хоронили здесь, в 12 слоёв. 12 000 видимых надгробий теснятся и поддерживают друг друга. Физически видимый слой памяти народа, у которого столетиями не было своей земли.', quote:'Когда нет земли — память хранится в камне.' },
+    'mucha-museum': { name:'Музей Альфонса Мухи', sub:'Nové Město', lat:50.08516, lng:14.42493, icon:'🎨', type:'extra', hours:'Ежедневно 10:00–18:00', desc:'В конце жизни Муха 18 лет писал «Славянскую эпопею» — 20 огромных полотен о судьбе народа. Отказывался от коммерческих заказов, жил в бедности. На вопрос «зачем?» отвечал: это мой дар народу.', quote:'Труд как дар народу — не ради славы, а ради памяти.' },
+    'vysehrad': { name:'Вышеград', sub:'Vyšehrad', lat:50.06419, lng:14.41890, icon:'🏰', type:'extra', hours:'Территория — круглосуточно', desc:'Крепость на скале, с которой начиналась Прага по преданию. Базилика Святых Петра и Павла. Кладбище Славин — здесь похоронены Дворжак, Сметана, Муха, Чапек. Скромные надгробия и огромный труд за каждым именем.', quote:'Что остаётся от человека. Не статус — плоды.' },
+    'petrin': { name:'Петршин холм', sub:'Malá Strana', lat:50.08139, lng:14.39389, icon:'🌲', type:'extra', hours:'Всегда открыт', desc:'Зелёный холм за домом. Яблоневые сады в цвету (начало мая — самое время), розарий, тишина. Наверху — смотровая площадка с видом на всю Прагу. Идеальное место для финального созерцания.', quote:'Когда слова заканчиваются — остаётся вид.' },
+    'letna': { name:'Летна — пивной сад', sub:'Holešovice', lat:50.09615, lng:14.42574, icon:'🍺', type:'extra', hours:'Открыт ежедневно', desc:'Пивной сад на утёсе над Влтавой. Вид на весь Старый город, Карлов мост, шпили Тынской церкви. Сотни жителей Праги — не туристов — с кружками на закате. Пластиковые стулья, живое пиво, один из красивейших видов на город в Европе. Только наличные.', quote:'Прага снизу выглядела как история. Сверху — как жизнь.' },
+    'lokal': { name:'Lokál U Bílé kužeLky', sub:'Míšeňská 12, Malá Strana', lat:50.08766, lng:14.40754, icon:'🍽️', type:'food', hours:'Пн–Пт 11:00–00:00 · Вс 11:00–23:00', desc:'Лучший чешский ресторан Малой Страны по мнению самих пражан — 3 минуты от дома. Свичкова, рулька, кнедлики. Pilsner Urquell из собственных кранов. Атмосфера живая, шумная, честная. Бронировать заранее.' }
+  },
+  ro: {
+    'home': { name:'Locuință', sub:'Dražického náměstí 10', lat:50.08700, lng:14.40750, icon:'🏠', type:'home', desc:'Casa voastră pe toată durata retreatului — în inima Malá Strana, la 100 de metri de Podul Carol.' },
+    'charles-bridge': { name:'Podul Carol', sub:'1357–1402 · Malá Strana', lat:50.08648, lng:14.41144, icon:'🌉', type:'program', hours:'Deschis non-stop', desc:'Treizeci de sculpturi baroce ale sfinților, amplasate din sec. XIV până în XVIII — fiecare creată de mâini concrete. Carol al IV-lea a construit podul ca un drum al pelerinilor: de aici plecau spre Roma. Pe fiecare piatră — urma unui efort și a unei rugăciuni. Seara după apus — aproape gol.', quote:'Pietrele care țin de 600 de ani — pentru că au fost așezate nu de dragul aparențelor.' },
+    'waldstein-garden': { name:'Grădina Wallenstein', sub:'1623 · Malá Strana', lat:50.09040, lng:14.40788, icon:'🌿', type:'extra', hours:'Lu–Vi 7:00–19:00 · Sâ–Du 9:00–19:00', desc:'Grădina barocă la 5 minute de casă — gratuită, liniștită dimineața. Generalul Wallenstein a dorit o grădină mai frumoasă decât cea a Castelului Praga. Alei de tei tunși, grotă cu stalactite artificiale, sculpturi bronzate, păuni vii.', quote:'Barocul ca încercare de a construi paradisul pe pământ. Aproape a reușit.' },
+    'nerudova': { name:'Strada Nerudova', sub:'Malá Strana → Hrad', lat:50.08852, lng:14.39944, icon:'🚶', type:'extra', hours:'Mereu deschisă', desc:'Drumul direct spre Castelul Praga — și una dintre cele mai frumoase străzi ale orașului. Înainte de 1770, casele nu aveau numere: fiecare purta emblema meșteșugarului. Munca ca identitate — cu mult înainte de cărțile de vizită.', quote:'O stradă unde fiecare casă este semnată cu meseria sa.' },
+    'orloj': { name:'Ceasul Astronomic', sub:'1410 · Staré Město', lat:50.08702, lng:14.42071, icon:'⚙️', type:'program', hours:'Piața deschisă non-stop · Figurine — în fiecare oră', desc:'Unul dintre cele mai vechi ceasuri astronomice din Europa, instalat în 1410. Pe cadran se afișează simultan mai multe niveluri de timp: obișnuit, vechi-ceh, mișcarea soarelui și a lunii. În sec. XV, o încercare de a aduna întregul cosmos într-un singur loc. În fiecare oră, figurile prind viață. Scheletul trage de frânghie — memento mori. În urma lui trec cei doisprezece apostoli.', visio:'Priviți ceasul ca pe o încercare de a cuprinde întreaga lume — timp, cer, moarte, înviere — într-un singur simbol. Ce spune aceasta despre omul care l-a creat?', quote:'Oamenii nu au construit aceasta pentru a măsura timpul. Ei căutau sens în ordinea lumii.' },
+    'tyn-church': { name:'Biserica Tyn', sub:'sec. XIV · Staré Město', lat:50.08775, lng:14.42254, icon:'⛪', type:'extra', hours:'Ma–Sâ 10:00–13:00 și 15:00–17:00 · Du 10:00–12:00', desc:'Turnuri gotice duble de 80 de metri — dominanta Orașului Vechi din sec. XIV. În sec. XV — principala biserică husită a Europei, reforma cu 100 de ani înainte de Luther. La altarul principal odihnește Tycho Brahe, astronomul danez care toată viața a privit spre stele.', quote:'Locul unde cerul și revolta trăiau sub același acoperiș.' },
+    'st-vitus': { name:'Catedrala Sfântul Vit', sub:'1344–1929 · Hradčany', lat:50.09089, lng:14.40051, icon:'⛪', type:'program', hours:'Lu–Sâ 9:00–16:00 · Du 12:00–16:00', desc:'Construcția a început în 1344 sub Carol al IV-lea, finalizată în 1929. Generații de oameni au lucrat, știind că nu vor apuca să vadă sfârșitul. Arhitectul Peter Parler și-a plasat autoportretul sculptural în triforium — alături de regi și arhiepiscopi. Pentru prima dată în Evul Mediu, un meșter s-a așezat alături de putere. Întreaga arhitectură gotică construită în jurul unei singure idei: Dumnezeu este lumină.', visio:'Găsiți un singur detaliu — o rază de lumină, o față pe un vitraliu, o linie de piatră — și priviți-l ca pe munca unui om concret. Ce spune acest om despre Dumnezeu prin mâinile sale?', quote:'Lucrurile mari nu se nasc din grabă, ci din credincioșie care durează mai mult decât o viață.' },
+    'kafka-museum': { name:'Muzeul Franz Kafka', sub:'Malá Strana · 3 min de casă', lat:50.08832, lng:14.41014, icon:'✍️', type:'extra', hours:'Zilnic 10:00–18:00', desc:'Kafka lucra ca agent de asigurări ziua și scria noaptea — toată viața. Nu a reușit niciodată să împace aceste două lumi: munca-pentru-viață și munca-pentru-sens. Expoziție labirintică, umbre, fragmente de manuscrise, atmosferă de anxietate și căutare.', quote:'Omul pentru care zarva s-a dezvăluit din interior — și care n-a putut-o accepta.' },
+    'strahov-library': { name:'Biblioteca Strahov', sub:'sec. XII · Hradčany', lat:50.08635, lng:14.38870, icon:'📚', type:'extra', hours:'Zilnic 9:00–17:00', desc:'Sala Teologică — 1679, tavane pictate, globuri, mii de coperți din piele. Sala Filozofică — tavan cu fresca «Drumul omului spre adevăr», înaltă de 18 metri. Călugării premonstrateni au adunat cărți timp de secole ca un legat pentru cei ce vor veni.', quote:'Munca asupra cunoașterii care nu are sfârșit — și călugării știau aceasta mai bine ca oricine.' },
+    'loreta': { name:'Loreta', sub:'1626 · Hradčany', lat:50.08924, lng:14.39151, icon:'⛪', type:'program', hours:'Zilnic 10:00–17:00', desc:'Complexul a fost fondat în 1626. În centru — «Sfânta Colibă» (Santa Casa): o copie a modestei case din Nazaret, unde a avut loc Întruparea. Alături — tezaurul. «Soarele de la Praga»: o monstranță decorată cu 6 222 de diamante. Aproape toate aceste comori sunt donații aduse cu mulțumire — pentru vindecare, pentru salvare, pentru rugăciune auzită.', visio:'Intrați mai întâi la Colibă. Apoi — în tezaur. Nu vă grăbiți. Ce simțiți în fiecare dintre aceste spații?', quote:'Te afli între două realități: simplitate extremă și glorie colosală. Acest loc nu oferă un răspuns simplu.' },
+    'sternberg': { name:'Galeria Națională — tabloul lui Cranach', sub:'Palatul Sternberg · Hradčany', lat:50.09037, lng:14.39667, icon:'🎨', type:'program', hours:'Ma–Du 10:00–18:00 (Lu — închis)', desc:'Lucas Cranach cel Bătrân, cca. 1529. Cranach era prieten apropiat al lui Luther și crea pictură ca manifest teologic. Tabloul este împărțit de un copac: uscat de partea Legii și verde de partea Harului. La stânga — un om fuge înspăimântat de moarte. La dreapta — același om, oprit în fața crucii.', visio:'Priviți mai întâi partea stângă — îndelung. Apoi dreapta. Ce se întâmplă înăuntrul vostru la această trecere?', quote:'Și treptat se vede: întrebarea nu e ce facem, ci pe ce stăm.' },
+    'charles-square': { name:'Piața Carol', sub:'1348 · Nové Město', lat:50.07575, lng:14.41994, icon:'🏛️', type:'program', hours:'Mereu deschisă', desc:'Orașul Nou a fost fondat în 1348 de împăratul Carol al IV-lea — unul dintre cele mai ambițioase proiecte urbanistice ale Evului Mediu. Carol al IV-lea a proiectat Orașul Nou după hărțile medievale ale Ierusalimului biblic. Piața Carol era centrul său simbolic. El a încercat literalmente să construiască «Noul Ierusalim» — un oraș gata pentru întoarcerea lui Hristos.', visio:'Stați în centrul pieței. Priviți în jur. Acest oraș a fost construit de oameni care așteptau pe Hristos. Ce simțiți voi?', quote:'Oamenii construiesc mereu cu speranță. Uneori conștientă. Și rămâne în liniște întrebarea: ce anume încercăm să construim în jurul nostru astăzi?' },
+    'old-new-synagogue': { name:'Sinagoga Veche-Nouă', sub:'1270 · Josefov', lat:50.09007, lng:14.41860, icon:'🕍', type:'extra', hours:'Lu–Vi 9:00–17:00 · Du 9:00–17:00 (Sâ — închis)', desc:'Cea mai veche sinagogă funcțională din Europa — din 1270. Conform legendei, în pod se află cenușa Golemului — uriașul de lut creat de rabinul Löw pentru protecția poporului. Golemul muncea neobosit — fără sabat, fără odihnă, fără Creator înăuntru. Ființa fără odihnă a devenit periculoasă.', quote:'Munca fără Dumnezeu devine Golem. Puternic — și distrugător.' },
+    'old-jewish-cemetery': { name:'Cimitirul Evreiesc Vechi', sub:'sec. XV–XVIII · Josefov', lat:50.08948, lng:14.41744, icon:'🪦', type:'extra', hours:'Lu–Vi 9:00–16:30 · Du 9:00–16:30 (Sâ — închis)', desc:'Evreilor li se interzicea să dețină pământ în afara ghettoului — de aceea îngropau aici, în 12 straturi. 12.000 de pietre funerare vizibile se înghesuie și se susțin una pe cealaltă. Stratul fizic de memorie al unui popor care timp de secole nu a avut propriul pământ.', quote:'Când nu există pământ — memoria se păstrează în piatră.' },
+    'mucha-museum': { name:'Muzeul Alfons Mucha', sub:'Nové Město', lat:50.08516, lng:14.42493, icon:'🎨', type:'extra', hours:'Zilnic 10:00–18:00', desc:'La sfârșitul vieții, Mucha a pictat 18 ani «Epopeea Slavă» — 20 de pânze uriașe despre destinul poporului. A refuzat comenzi comerciale, a trăit în sărăcie. La întrebarea «de ce?» răspundea: acesta este darul meu pentru popor.', quote:'Munca ca dar pentru popor — nu pentru slavă, ci pentru memorie.' },
+    'vysehrad': { name:'Vyšehrad', sub:'Vyšehrad', lat:50.06419, lng:14.41890, icon:'🏰', type:'extra', hours:'Teritoriu — non-stop', desc:'Cetatea de pe stâncă de unde a început Praga conform tradiției. Bazilica Sfinților Petru și Pavel. Cimitirul Slavín — aici sunt înmormântați Dvořák, Smetana, Mucha, Čapek. Pietre funerare modeste și o muncă enormă în spatele fiecărui nume. Vederi spre Vltava fără aglomerație turistică.', quote:'Ce rămâne din om. Nu statutul — roadele.' },
+    'petrin': { name:'Dealul Petřín', sub:'Malá Strana', lat:50.08139, lng:14.39389, icon:'🌲', type:'extra', hours:'Mereu deschis', desc:'Dealul verde de lângă casă. Livezi de meri înfloriți (începutul lui mai — momentul perfect), trandafirar, liniște. Sus — belvedere cu vedere asupra întregii Praga. Loc ideal pentru contemplație finală — fără explicații, doar cer și oraș.', quote:'Când cuvintele se termină — rămâne priveliștea.' },
+    'letna': { name:'Letná — grădina de bere', sub:'Holešovice', lat:50.09615, lng:14.42574, icon:'🍺', type:'extra', hours:'Deschis zilnic', desc:'Grădina de bere pe faleza de deasupra Vltavei. Vedere asupra întregului Oraș Vechi, Podul Carol, turnurile Bisericii Tyn. Sute de localnici — nu turiști — cu halbe la apus. Scaune de plastic, bere proaspătă, una dintre cele mai frumoase vederi din Europa. Numai numerar.', quote:'Praga de jos arăta ca istorie. De sus — ca viață.' },
+    'lokal': { name:'Lokál U Bílé kužeLky', sub:'Míšeňská 12, Malá Strana', lat:50.08766, lng:14.40754, icon:'🍽️', type:'food', hours:'Lu–Vi 11:00–00:00 · Du 11:00–23:00', desc:'Cel mai bun restaurant ceh din Malá Strana după opinia localnicilor — 3 minute de casă. Svíčková, ciocănel de porc, knedlíky. Pilsner Urquell din robinete proprii. Atmosferă vie, zgomotoasă, sinceră. Rezervare în avans.' }
+  }
+};
+
+// ── DAYS DATA ─────────────────────────────────────────────────────────────────
+const DAYS_DATA = {
+  ru: [
+    {
+      id:0, date:'2026-05-06', label:'6 мая',
+      title:'Приезд', theme:'Первый вечер в Праге',
+      question:'Что ты знаешь о значении труда для человека — и что хочешь понять глубже за эти дни?',
+      lectio:null,
+      schedule:[
+        { time:'После заезда', type:'free', icon:'🏠', label:'ci-gold', title:'Обустройство', desc:'Разместитесь, выдохните. Дом на Dražického náměstí 10 — в 100 шагах от Карлова моста.' },
+        { time:'Вечер', type:'walk', icon:'🌉', label:'ci-blue', placeId:'charles-bridge', title:'Карлов мост', desc:'Первая прогулка. Вечером мост пустеет — 30 барочных святых в тишине и фонари в реке.' },
+        { time:'Вечер', type:'gathering', icon:'👥', label:'ci-green', title:'Первый общий сбор', desc:'Открывающий вопрос ритрита: «Что ты знаешь о значении труда для человека?»' }
+      ],
+      places:['charles-bridge'], extras:['waldstein-garden'],
+      scripture:null
+    },
+    {
+      id:1, date:'2026-05-07', label:'7 мая',
+      title:'День 1', theme:'«Бог-Творец. Человек — Его отражение»',
+      lectio:{ passage:'Псалом 19:2–5', steps:[
+        { text:'Медленно прочитайте отрывок. Читайте так, словно текст диктуется лично вам Духом Святым.', q:'Что Бог говорит мне через этот текст?' },
+        { text:'Размышляйте над прочитанным. Повторяйте слово или фразу, которая отозвалась внутри.', q:'Как эти слова относятся к моей жизни?' },
+        { text:'Ответьте Богу. Это может быть благодарность, просьба, покаяние или восхваление.', q:'Что я хочу сказать Богу в ответ?' },
+        { text:'Прекратите думать. Пребывайте в тишине, принимая Его присутствие.', q:'Как мне принять Божью любовь и истину?' }
+      ]},
+      schedule:[
+        { time:'9:00', type:'lectio', icon:'📖', label:'ci-blue', title:'Lectio Divina', desc:'Псалом 19:2–5 · 30 минут тишины · В конце — одно слово от каждого' },
+        { time:'11:00', type:'walk', icon:'⚙️', label:'ci-blue', placeId:'orloj', title:'Орлой — Старомест. площадь', desc:'Пешком через Карлов мост в Старый город' },
+        { time:'14:30', type:'walk', icon:'⛪', label:'ci-blue', placeId:'st-vitus', title:'Собор Святого Вита', desc:'Через Нерудову улицу вверх к Пражскому Граду' },
+        { time:'16:00', type:'study', icon:'📚', label:'ci-green', title:'Изучение Писания', desc:'Бытие 1:26 – 2:15 · Дискуссия 1 час' }
+      ],
+      places:['waldstein-garden','orloj','tyn-church','st-vitus'],
+      extras:['nerudova','kafka-museum'],
+      scripture:{
+        passages:['Бытие 1:26 – 2:15'],
+        questions:[
+          { num:'1', text:'Бог работает шесть дней, создаёт мир. Потом создаёт человека по образу Своему — и сразу даёт ему работу. Что это говорит о том, что значит быть человеком? Как это проявлялось в мире без греха?' },
+          { num:'2', text:'Адам не создаёт новый сад — он получает готовый. Но Бог приводит к нему животных, чтобы давал им имена. Это первый человеческий творческий акт. Почему именно такое задание? Что значит, что Бог принимает те имена, которые Адам даёт?' },
+          { num:'3', text:'Бог отдыхает в седьмой день — до того, как даёт человеку труд. Отдых предшествует работе. Как это влияет на наше отношение к труду и служению?' },
+          { num:'4', text:'«Возделывать и хранить» — в еврейском оригинале оба глагола используются для служения священников в Храме. Что это говорит о понимании нашей повседневной работы?' }
+        ],
+        conclusion:'Молитва благодарения. Каждый называет один аспект своего труда (служение, домашние дела, прочее), в котором видит след образа Творца.'
+      }
+    },
+    {
+      id:2, date:'2026-05-08', label:'8 мая',
+      title:'День 2', theme:'«Искажение. Другой путь.»',
+      note:'8 мая — государственный праздник Чехии (День победы в Европе)',
+      lectio:{ passage:'Екклесиаст 1:2–3', steps:[
+        { text:'Медленно прочитайте отрывок. «Суета сует...»', q:'Что Бог говорит мне через этот текст?' },
+        { text:'Позвольте словам «суета» и «погоня за ветром» работать. Не торопитесь объяснить.', q:'Как эти слова относятся к моей жизни?' },
+        { text:'Ответьте Богу честно — что вы чувствуете, читая это? Усталость? Облегчение? Тревогу?', q:'Что я хочу сказать Богу в ответ?' },
+        { text:'Пребывайте в тишине. Позвольте Слову изменить что-то внутри.', q:'Как мне принять Его любовь и истину?' }
+      ]},
+      schedule:[
+        { time:'9:00', type:'lectio', icon:'📖', label:'ci-blue', title:'Lectio Divina', desc:'Екклесиаст 1:2–3 · 30 минут тишины' },
+        { time:'10:30', type:'walk', icon:'⛪', label:'ci-blue', placeId:'loreta', title:'Лорета — Градчаны', desc:'Хижина из Назарета рядом с 6222 бриллиантами' },
+        { time:'12:30', type:'walk', icon:'🎨', label:'ci-blue', placeId:'sternberg', title:'Штернберкский дворец', desc:'Кранах «Закон и Благодать» — 3 мин от Лореты' },
+        { time:'16:00', type:'study', icon:'📚', label:'ci-green', title:'Изучение Писания', desc:'Екк 2 / Еф 2:8–10 / Исх 31:2–6' }
+      ],
+      places:['kafka-museum','strahov-library','loreta','sternberg'],
+      extras:[],
+      scripture:{
+        passages:['Екклесиаст 2:1–26','Ефесянам 2:8–10','Исход 31:2–6'],
+        questions:[
+          { num:'1', text:'Екклесиаст построил дома, насадил виноградники, собрал богатство — и назвал всё это «суетой». Но в конце той же главы говорит: «нет ничего лучше, чем есть, пить и находить радость в труде своём». Это противоречие — или тут есть что-то более глубокое?' },
+          { num:'2', text:'В чём разница между трудом Екклесиаста и трудом Веселеила (Исх 31)? Где проходит граница между трудом-служением и пустой суетой — намерения, цели, средства, отношение?' },
+          { num:'3', text:'Ефесянам говорит: спасены не делами — и в следующей строчке: созданы для добрых дел. Это переворот или последовательность? Что меняется в труде человека, если он сначала получает, а потом отдаёт?' },
+          { num:'4', text:'«Мы — Его ποίημα» — поэма, произведение. Поэма существует не ради функции, а ради смысла и встречи. Что это говорит о том, как Бог смотрит на тебя во времена твоей неэффективности?' }
+        ],
+        conclusion:'Молитва друг за друга. Молимся о том, чтобы нам глубоко понять и укрепиться в благодати и любви Творца.'
+      }
+    },
+    {
+      id:3, date:'2026-05-09', label:'9 мая',
+      title:'День 3', theme:'«Надежда. Труд искуплён.»',
+      lectio:{ passage:'Откровение 21:1–5', steps:[
+        { text:'Читайте медленно: «Вот, Я творю всё новое».', q:'Что Бог говорит мне через этот текст?' },
+        { text:'Позвольте образу нового неба и новой земли остаться перед вами.', q:'Как эти слова относятся к моей жизни?' },
+        { text:'Ответьте Богу. Что вы хотите принести в Его новый мир?', q:'Что я хочу сказать Богу в ответ?' },
+        { text:'Пребывайте в тишине с образом «всё новое».', q:'Как мне принять эту надежду?' }
+      ]},
+      schedule:[
+        { time:'9:00', type:'lectio', icon:'📖', label:'ci-blue', title:'Lectio Divina', desc:'Откровение 21:1–5 · 30 минут тишины' },
+        { time:'11:00', type:'walk', icon:'🕍', label:'ci-blue', placeId:'old-new-synagogue', title:'Еврейский квартал — по дороге', desc:'Старо-Новая синагога и Старое кладбище' },
+        { time:'12:30', type:'walk', icon:'🏛️', label:'ci-blue', placeId:'charles-square', title:'Карлова площадь', desc:'Карл IV строил Новый Иерусалим' },
+        { time:'16:00', type:'study', icon:'📚', label:'ci-green', title:'Изучение Писания', desc:'Исаия 65:17–25 / Откровение 21:22–27' }
+      ],
+      places:['old-new-synagogue','old-jewish-cemetery','mucha-museum','charles-square'],
+      extras:[],
+      scripture:{
+        passages:['Исаия 65:17–25','Откровение 21:22–27'],
+        questions:[
+          { num:'1', text:'В новом творении у Исаии люди строят дома и живут в них, сажают виноградники и едят их плоды. Почему в видении полного Божьего восстановления есть физический труд — а не только поклонение и покой?' },
+          { num:'2', text:'Откровение говорит, что «слава и честь народов» войдёт в Новый Иерусалим. Что бы ты хотел увидеть там со стороны своего народа? Что из твоего собственного труда ты хотел бы туда принести?' },
+          { num:'3', text:'В Новом Иерусалиме нет Храма — потому что сам Бог является Храмом. Что это говорит о всём, что мы строим сейчас — церкви, служения, организации?' },
+          { num:'4', text:'Ворота города никогда не закрываются — но «ничто нечистое не войдёт». Как ты понимаешь эту логику — и что она говорит о природе Божьего Царства?' }
+        ],
+        conclusion:'Каждый называет одну мысль — то, с чем уходит из этого дня. Завершите общей молитвой за нашу страну и города, где мы служим.'
+      }
+    },
+    {
+      id:4, date:'2026-05-10', label:'10 мая',
+      title:'День 4', theme:'Просто гуляем и наслаждаемся жизнью',
+      lectio:null,
+      schedule:[
+        { time:'9:00', type:'gathering', icon:'🙏', label:'ci-blue', title:'Завершение ритрита', desc:'Три вопроса перед отъездом + молитва друг за друга' },
+        { time:'Свободно', type:'free', icon:'🏰', label:'ci-gold', placeId:'vysehrad', title:'Вышеград', desc:'Кладбище великих чехов — Дворжак, Муха, Чапек. Виды на Влтаву без толп.' },
+        { time:'Свободно', type:'free', icon:'🌲', label:'ci-green', placeId:'petrin', title:'Петршин холм', desc:'Яблоневые сады в цвету, вид на город, финальное созерцание' },
+        { time:'Вечер', type:'free', icon:'🍺', label:'ci-gold', placeId:'letna', title:'Летна — пивной сад', desc:'Прощальный вечер с видом на весь город' }
+      ],
+      places:['waldstein-garden','petrin','vysehrad','letna'],
+      extras:['old-jewish-cemetery','mucha-museum'],
+      scripture:{
+        passages:[], isClosing:true,
+        questions:[
+          { num:'1', text:'Что из увиденного в этом городе ты не хочешь забыть?' },
+          { num:'2', text:'Что изменилось в том, как ты смотришь на свой труд?' },
+          { num:'3', text:'Кому первому ты хочешь передать то, что открылось за эти дни?' }
+        ],
+        conclusion:'Молитва над каждым человеком в команде. Не длинная. Одно предложение.'
+      }
+    }
+  ],
+  ro: [
+    {
+      id:0, date:'2026-05-06', label:'6 mai',
+      title:'Sosire', theme:'Prima seară în Praga',
+      question:'Ce știi despre semnificația muncii pentru om — și ce vrei să înțelegi mai profund în aceste zile?',
+      lectio:null,
+      schedule:[
+        { time:'După cazare', type:'free', icon:'🏠', label:'ci-gold', title:'Instalare', desc:'Instalați-vă, respirați. Casa pe Dražického náměstí 10 — la 100 de pași de Podul Carol.' },
+        { time:'Seara', type:'walk', icon:'🌉', label:'ci-blue', placeId:'charles-bridge', title:'Podul Carol', desc:'Prima plimbare. Seara podul se golește — 30 de sfinți barocici în liniște și felinare în râu.' },
+        { time:'Seara', type:'gathering', icon:'👥', label:'ci-green', title:'Prima întrunire', desc:'Întrebarea de deschidere a retreatului: «Ce știi despre semnificația muncii pentru om?»' }
+      ],
+      places:['charles-bridge'], extras:['waldstein-garden'],
+      scripture:null
+    },
+    {
+      id:1, date:'2026-05-07', label:'7 mai',
+      title:'Ziua 1', theme:'«Dumnezeu — Creatorul. Omul — Reflectarea Sa.»',
+      lectio:{ passage:'Psalmul 19:2–5', steps:[
+        { text:'Citiți încet și cu atenție pasajul. Citiți ca și cum textul v-ar fi dictat personal de Duhul Sfânt.', q:'Ce îmi spune Dumnezeu prin acest text?' },
+        { text:'Meditați asupra celor citite. Repetați cuvântul sau expresia care a răsunat înăuntru, pătrunzând în sensul ei.', q:'Cum se raportează aceste cuvinte la viața mea?' },
+        { text:'Răspundeți lui Dumnezeu la Cuvântul Său. Poate fi mulțumire, cerere, pocăință sau laudă.', q:'Ce vreau să-I spun lui Dumnezeu ca răspuns la Cuvântul Său?' },
+        { text:'Încetați să mai gândiți și rămâneți pur și simplu în liniște înaintea lui Dumnezeu, bucurându-vă de prezența Sa.', q:'Cum să primesc dragostea și adevărul lui Dumnezeu?' }
+      ]},
+      schedule:[
+        { time:'9:00', type:'lectio', icon:'📖', label:'ci-blue', title:'Lectio Divina', desc:'Psalmul 19:2–5 · 30 de minute de liniște · La final — un cuvânt de la fiecare' },
+        { time:'11:00', type:'walk', icon:'⚙️', label:'ci-blue', placeId:'orloj', title:'Ceasul Astronomic — Piața Veche', desc:'Pe jos prin Podul Carol spre Orașul Vechi' },
+        { time:'14:30', type:'walk', icon:'⛪', label:'ci-blue', placeId:'st-vitus', title:'Catedrala Sfântul Vit', desc:'Prin strada Nerudova sus spre Castelul Praga' },
+        { time:'16:00', type:'study', icon:'📚', label:'ci-green', title:'Studiu biblic', desc:'Geneza 1:26 – 2:15 · Discuție 1 oră' }
+      ],
+      places:['waldstein-garden','orloj','tyn-church','st-vitus'],
+      extras:['nerudova','kafka-museum'],
+      scripture:{
+        passages:['Geneza 1:26 – 2:15'],
+        questions:[
+          { num:'1', text:'Dumnezeu lucrează șase zile, El creează lumea. Apoi creează omul după chipul Său — și imediat îi dă de lucru. Ce spune aceasta despre ceea ce înseamnă să fii om? Cum s-ar fi putut manifesta aceasta într-o lume fără păcat?' },
+          { num:'2', text:'Adam nu creează o grădină nouă — o primește gata făcută. Dar Dumnezeu îi aduce animale ca să le dea nume. Acesta este primul act creator al omului în Scriptură. De ce credeți că tocmai această sarcină? Ce înseamnă că Dumnezeu acceptă numele pe care Adam le dă?' },
+          { num:'3', text:'Dumnezeu Se odihnește în ziua a șaptea — înainte de a-i da omului de lucru. Odihna precede munca. Cum influențează aceasta atitudinea față de muncă și slujire?' },
+          { num:'4', text:'«A lucra și a păzi» — două verbe care descriu munca omului. În originalul ebraic, ambele sunt folosite ulterior pentru slujirea preoților în Templu. Ce înseamnă aceasta pentru înțelegerea muncii noastre zilnice?' }
+        ],
+        conclusion:'Rugăciune de mulțumire. Fiecare numește un aspect al muncii sale (slujire, treburi casnice, altele) în care vede urma chipului Creatorului.'
+      }
+    },
+    {
+      id:2, date:'2026-05-08', label:'8 mai',
+      title:'Ziua 2', theme:'«Denaturarea. O altă cale.»',
+      note:'8 mai — ziua națională a Cehiei (Ziua Victoriei în Europa)',
+      lectio:{ passage:'Eclesiastul 1:2–3', steps:[
+        { text:'Citiți încet pasajul. «Deșertăciune a deșertăciunilor...»', q:'Ce îmi spune Dumnezeu prin acest text?' },
+        { text:'Lăsați cuvintele «deșertăciune» și «goană după vânt» să lucreze. Nu vă grăbiți să explicați.', q:'Cum se raportează aceste cuvinte la viața mea?' },
+        { text:'Răspundeți lui Dumnezeu sincer — ce simțiți citind aceasta? Oboseală? Ușurare? Îngrijorare?', q:'Ce vreau să-I spun lui Dumnezeu ca răspuns?' },
+        { text:'Rămâneți în liniște. Lăsați Cuvântul lui Dumnezeu să transforme ceva înăuntru.', q:'Cum să primesc dragostea și adevărul Lui?' }
+      ]},
+      schedule:[
+        { time:'9:00', type:'lectio', icon:'📖', label:'ci-blue', title:'Lectio Divina', desc:'Eclesiastul 1:2–3 · 30 de minute de liniște' },
+        { time:'10:30', type:'walk', icon:'⛪', label:'ci-blue', placeId:'loreta', title:'Loreta — Hradčany', desc:'Coliba din Nazaret lângă 6222 de diamante' },
+        { time:'12:30', type:'walk', icon:'🎨', label:'ci-blue', placeId:'sternberg', title:'Galeria Națională', desc:'Cranach «Lege și Har» — 3 min de la Loreta' },
+        { time:'16:00', type:'study', icon:'📚', label:'ci-green', title:'Studiu biblic', desc:'Ecl 2 / Ef 2:8–10 / Ieș 31:2–6' }
+      ],
+      places:['kafka-museum','strahov-library','loreta','sternberg'],
+      extras:[],
+      scripture:{
+        passages:['Eclesiastul 2:1–26','Efeseni 2:8–10','Exodul 31:2–6'],
+        questions:[
+          { num:'1', text:'Ecclesiastul a construit case, a plantat vii, a adunat avere — și a numit toate acestea «deșertăciune și goană după vânt». Dar la sfârșitul aceluiași capitol spune: «nu este nimic mai bun pentru om decât să mănânce și să bea și să-și găsească bucurie în munca sa». Este aceasta o contradicție — sau există ceva mai profund?' },
+          { num:'2', text:'Care este diferența dintre munca Ecclesiastului și munca lui Bețaleel? Unde se află granița dintre munca-slujire și simpla deșertăciune — intenții, scopuri, mijloace, atitudine?' },
+          { num:'3', text:'Efeseni spune: mântuiți nu prin fapte — și în rândul următor: creați pentru fapte bune. Este aceasta o răsturnare sau o succesiune? Ce se schimbă în munca omului dacă el mai întâi primește, iar apoi dăruiește?' },
+          { num:'4', text:'«Noi suntem ποίημα-ul Său» — o poezie, o operă. Poezia există nu pentru funcție, ci pentru sens și întâlnire. Ce spune aceasta despre felul în care Dumnezeu te privește în perioadele tale de ineficiență?' }
+        ],
+        conclusion:'Rugăciune unii pentru alții. Ne rugăm ca să înțelegem profund și să fim întăriți în harul și dragostea Creatorului.'
+      }
+    },
+    {
+      id:3, date:'2026-05-09', label:'9 mai',
+      title:'Ziua 3', theme:'«Nădejde. Munca răscumpărată.»',
+      lectio:{ passage:'Apocalipsa 21:1–5', steps:[
+        { text:'Citiți încet: «Iată, Eu fac toate lucrurile noi».', q:'Ce îmi spune Dumnezeu prin acest text?' },
+        { text:'Lăsați imaginea cerului nou și a pământului nou să rămână în fața voastră.', q:'Cum se raportează aceste cuvinte la viața mea?' },
+        { text:'Răspundeți lui Dumnezeu. Ce vreți să aduceți în lumea Sa nouă?', q:'Ce vreau să-I spun lui Dumnezeu ca răspuns?' },
+        { text:'Rămâneți în liniște cu imaginea «totul nou». Primiți această nădejde.', q:'Cum să primesc această nădejde?' }
+      ]},
+      schedule:[
+        { time:'9:00', type:'lectio', icon:'📖', label:'ci-blue', title:'Lectio Divina', desc:'Apocalipsa 21:1–5 · 30 de minute de liniște' },
+        { time:'11:00', type:'walk', icon:'🕍', label:'ci-blue', placeId:'old-new-synagogue', title:'Cartierul evreiesc — pe drum', desc:'Sinagoga Veche-Nouă și Cimitirul Vechi' },
+        { time:'12:30', type:'walk', icon:'🏛️', label:'ci-blue', placeId:'charles-square', title:'Piața Carol', desc:'Carol al IV-lea a construit Noul Ierusalim' },
+        { time:'16:00', type:'study', icon:'📚', label:'ci-green', title:'Studiu biblic', desc:'Isaia 65:17–25 / Apocalipsa 21:22–27' }
+      ],
+      places:['old-new-synagogue','old-jewish-cemetery','mucha-museum','charles-square'],
+      extras:[],
+      scripture:{
+        passages:['Isaia 65:17–25','Apocalipsa 21:22–27'],
+        questions:[
+          { num:'1', text:'În noua creație la Isaia, oamenii construiesc case și locuiesc în ele, plantează vii și mănâncă roadele lor. De ce în viziunea restaurării depline a lui Dumnezeu există muncă fizică — și nu doar închinare și odihnă?' },
+          { num:'2', text:'Apocalipsa spune că «slava și cinstea neamurilor» vor intra în Noul Ierusalim. Ce ai vrea să vezi acolo din partea poporului tău? Ce din propria ta muncă ai vrea să aduci acolo?' },
+          { num:'3', text:'În Noul Ierusalim nu există Templu — pentru că Dumnezeu Însuși este Templul. Ce spune aceasta despre tot ce construim acum — biserici, slujiri, organizații?' },
+          { num:'4', text:'Porțile cetății nu se închid niciodată — dar «nimic necurat nu va intra». Cum înțelegi această logică — și ce spune ea despre natura Împărăției lui Dumnezeu?' }
+        ],
+        conclusion:'Fiecare numește un gând — ceea ce ia cu el din această zi. Încheiați cu rugăciune comună pentru țara noastră și orașele unde am slujit.'
+      }
+    },
+    {
+      id:4, date:'2026-05-10', label:'10 mai',
+      title:'Ziua 4', theme:'Ne plimbăm și ne bucurăm de viață',
+      lectio:null,
+      schedule:[
+        { time:'9:00', type:'gathering', icon:'🙏', label:'ci-blue', title:'Încheierea retreatului', desc:'Trei întrebări înainte de plecare + rugăciune unii pentru alții' },
+        { time:'Liber', type:'free', icon:'🏰', label:'ci-gold', placeId:'vysehrad', title:'Vyšehrad', desc:'Cimitirul marilor cehi — Dvořák, Mucha, Čapek. Vederi spre Vltava fără mulțimi.' },
+        { time:'Liber', type:'free', icon:'🌲', label:'ci-green', placeId:'petrin', title:'Dealul Petřín', desc:'Livezi de meri înfloriți, vedere asupra orașului, contemplație finală' },
+        { time:'Seara', type:'free', icon:'🍺', label:'ci-gold', placeId:'letna', title:'Letná — grădina de bere', desc:'Seara de adio cu vedere asupra întregului oraș' }
+      ],
+      places:['waldstein-garden','petrin','vysehrad','letna'],
+      extras:['old-jewish-cemetery','mucha-museum'],
+      scripture:{
+        passages:[], isClosing:true,
+        questions:[
+          { num:'1', text:'Ce din ceea ce ai văzut în acest oraș nu vrei să uiți?' },
+          { num:'2', text:'Ce s-a schimbat în felul în care privești munca ta?' },
+          { num:'3', text:'Cui vrei să transmiți primul ceea ce ți s-a revelat în aceste zile?' }
+        ],
+        conclusion:'Rugăciune peste fiecare persoană din echipă. Nu lungă. O singură propoziție.'
+      }
+    }
+  ]
+};
+
+// ── APP STATE ─────────────────────────────────────────────────────────────────
+let currentDayId = 0;
+let activeTab = 'today';
+let currentLang = 'ru';
+let map = null;
+let mapMarkers = {};
+let userMarker = null;
+let userLat = null, userLng = null;
+
+const HOME = { lat:50.08700, lng:14.40750 };
+
+function PLACES() { return PLACES_DATA[currentLang]; }
+function DAYS()   { return DAYS_DATA[currentLang]; }
+function L()      { return UI[currentLang]; }
+
+function getCurrentDayId() {
+  const now = new Date();
+  const days = DAYS_DATA.ru;
+  for (let i = 0; i < days.length; i++) {
+    const d = new Date(days[i].date);
+    if (now.toDateString() === d.toDateString()) return i;
+  }
+  const start = new Date(days[0].date);
+  const end   = new Date(days[days.length-1].date);
+  if (now < start) return 0;
+  if (now > end)   return days.length - 1;
+  return 0;
+}
+
+function haversineKm(lat1,lng1,lat2,lng2) {
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function fmtDist(km){ return km<1?Math.round(km*1000)+' м':km.toFixed(1)+' км'; }
+function mapsUrl(lat,lng,name){ return `https://maps.google.com/?q=${lat},${lng}(${encodeURIComponent(name)})`; }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderHeader() {
+  const days = DAYS();
+  const ui = L();
+  const d = days[currentDayId];
+  document.getElementById('hdr-date').textContent = ui.dates[currentDayId] + ui.cityUnit;
+  document.getElementById('hdr-title').textContent = ui.appTitle;
+  const dates = ['6','7','8','9','10'];
+  const pills = document.getElementById('day-pills');
+  pills.innerHTML = days.map((dd,i) => `<button class="dpill${i===currentDayId?' active':''}" onclick="switchDay(${i})">${dates[i]}</button>`).join('');
+  document.getElementById('nl-today').textContent   = ui.nav.today;
+  document.getElementById('nl-map').textContent     = ui.nav.map;
+  document.getElementById('nl-places').textContent  = ui.nav.places;
+  document.getElementById('nl-scripture').textContent = ui.nav.scripture;
+}
+
+function renderToday() {
+  const d = DAYS()[currentDayId];
+  const ui = L();
+  let html = '';
+
+  html += `<div class="day-hero">
+    <div class="hero-label">${d.title}</div>
+    <div class="hero-title">${d.theme}</div>
+    ${d.lectio ? `<div class="hero-passage">📖 ${d.lectio.passage}</div>` : ''}
+  </div>`;
+
+  if (d.question) {
+    html += `<div class="question-card">
+      <div class="qc-label">${ui.l.openQuestion}</div>
+      <div class="qc-text">${d.question}</div>
+    </div>`;
+  }
+  if (d.note) {
+    html += `<div style="background:#fff8e6;border:1px solid #e8c84a;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#7a5e00;">⚡ ${d.note}</div>`;
+  }
+
+  html += `<div class="section-label">${ui.s.schedule}</div>`;
+  d.schedule.forEach((item,i) => {
+    const place = item.placeId ? PLACES()[item.placeId] : null;
+    html += `<div class="tl-item" id="tl-${i}">
+      <div class="tl-dot"><span>${item.icon}</span></div>
+      <div class="tl-right">
+        <div class="tl-time">${item.time}</div>
+        <div class="tl-title">${item.title}</div>
+        <div class="tl-sub">${item.desc}</div>
+        ${place ? `<div style="margin-top:6px"><a class="action-btn blue" href="${mapsUrl(place.lat,place.lng,place.name)}" target="_blank" style="font-size:11px;padding:5px 10px;">${ui.l.openMap}</a></div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  if (currentDayId === 4 && d.scripture) {
+    html += `<div class="section-label" style="margin-top:20px">${ui.s.closing}</div>`;
+    d.scripture.questions.forEach(q => {
+      html += `<div class="q-item"><div class="q-num">${ui.l.question} ${q.num}</div><div class="q-text">${q.text}</div></div>`;
+    });
+  }
+  document.getElementById('today-inner').innerHTML = html;
+}
+
+function renderPlaces() {
+  const d = DAYS()[currentDayId];
+  const ui = L();
+  const places = PLACES();
+  let html = '';
+
+  const renderPlace = (pid, tagType) => {
+    const p = places[pid];
+    if (!p) return '';
+    const dist = (userLat && userLng) ? fmtDist(haversineKm(userLat, userLng, p.lat, p.lng)) : null;
+    const tagLabel = tagType==='program'
+      ? `<span class="tag tag-prog">${ui.l.program}</span>`
+      : tagType==='food'
+      ? `<span class="tag tag-food">${ui.l.food}</span>`
+      : `<span class="tag tag-extra">${ui.l.extra}</span>`;
+    return `<div class="card">
+      <div class="card-head" onclick="toggleCard('pc-${pid}','arr-${pid}')">
+        <div class="card-icon ${p.type==='food'?'ci-terra':p.type==='home'?'ci-green':tagType==='program'?'ci-blue':'ci-gold'}">${p.icon}</div>
+        <div class="card-meta">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${tagLabel}${dist?`<span class="dist-badge">~${dist}</span>`:''}</div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-sub">${p.sub}${p.hours?` · <span style="color:var(--t3)">${p.hours}</span>`:''}</div>
+        </div>
+      </div>
+      <button class="expand-toggle" onclick="toggleCard('pc-${pid}','arr-${pid}')">
+        <span>${ui.l.readDesc}</span><span class="expand-arrow" id="arr-${pid}">▼</span>
+      </button>
+      <div class="card-body" id="pc-${pid}">
+        <div class="card-desc">${p.desc}</div>
+        ${p.visio ? `<div class="card-visio">${p.visio}</div>` : ''}
+        ${p.quote ? `<div class="card-quote">${p.quote}</div>` : ''}
+        <div class="card-actions mt-8">
+          <a class="action-btn blue" href="${mapsUrl(p.lat,p.lng,p.name)}" target="_blank">${ui.l.openMap}</a>
+        </div>
+      </div>
+    </div>`;
+  };
+
+  if (d.places.length) {
+    html += `<div class="section-label">${ui.s.placesProgram}</div>`;
+    d.places.forEach(pid => { html += renderPlace(pid,'program'); });
+  }
+  if (d.extras && d.extras.length) {
+    html += `<div class="section-label">${ui.s.placesExtra}</div>`;
+    d.extras.forEach(pid => { html += renderPlace(pid,'extra'); });
+  }
+  html += `<div class="section-label">${ui.s.placesPermanent}</div>`;
+  html += renderPlace('home','extra');
+  html += renderPlace('lokal','food');
+
+  document.getElementById('places-inner').innerHTML = html;
+}
+
+function renderScripture() {
+  const d = DAYS()[currentDayId];
+  const ui = L();
+  const steps = LECTIO_STEPS[currentLang];
+  let html = '';
+
+  if (d.lectio) {
+    html += `<div class="section-label">${ui.s.lectio} — ${d.lectio.passage}</div>`;
+    d.lectio.steps.forEach((s,i) => {
+      html += `<div class="lectio-step">
+        <div class="ls-head" onclick="toggleCard('ls-${i}','lsa-${i}')">
+          <div class="ls-num">${i+1}</div>
+          <div><div class="ls-name">${steps[i].name}</div><div class="ls-sub">${steps[i].sub}</div></div>
+          <span class="expand-arrow" id="lsa-${i}" style="margin-left:auto;color:var(--t3)">▼</span>
+        </div>
+        <div class="card-body" id="ls-${i}">
+          <p>${s.text}</p>
+          <div class="ls-q">${s.q}</div>
+        </div>
+      </div>`;
+    });
+    html += `<div style="background:var(--blue-ll);border-radius:12px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--t2);border:1px solid var(--border);">${ui.l.lectioEnd}</div>`;
+  }
+
+  if (d.scripture) {
+    if (d.scripture.passages && d.scripture.passages.length) {
+      html += `<div class="section-label">${ui.s.study}</div>`;
+      html += `<div style="margin-bottom:12px">`;
+      d.scripture.passages.forEach(p => { html += `<span class="passage-chip">${p}</span>`; });
+      html += `</div>`;
+    } else if (d.scripture.isClosing) {
+      html += `<div class="section-label">${ui.s.closing}</div>`;
+    }
+    d.scripture.questions.forEach(q => {
+      html += `<div class="q-item"><div class="q-num">${ui.l.question} ${q.num}</div><div class="q-text">${q.text}</div></div>`;
+    });
+    if (d.scripture.conclusion) {
+      html += `<div class="conclusion-card"><div class="cc-label">${ui.l.conclusion}</div><div class="cc-text">${d.scripture.conclusion}</div></div>`;
+    }
+  }
+
+  if (!d.lectio && !d.scripture) {
+    html += `<div class="no-content">${ui.l.restDay}</div>`;
+  }
+
+  document.getElementById('scripture-inner').innerHTML = html;
+}
+
+// ── MAP ───────────────────────────────────────────────────────────────────────
+function initMap() {
+  if (map) return;
+  map = L.map('map',{zoomControl:false}).setView([HOME.lat,HOME.lng],15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(map);
+  L.control.zoom({position:'bottomright'}).addTo(map);
+}
+
+function updateMapMarkers() {
+  if (!map) return;
+  Object.values(mapMarkers).forEach(m => map.removeLayer(m));
+  mapMarkers = {};
+  const d = DAYS()[currentDayId];
+  const all = [...d.places,...(d.extras||[])];
+  const homeM = L.marker([HOME.lat,HOME.lng],{icon:L.divIcon({className:'',html:'<div style="background:#3d6b4f;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)">🏠</div>',iconSize:[32,32],iconAnchor:[16,16]})});
+  homeM.addTo(map);
+  homeM.on('click',()=>showMapInfo('home'));
+  mapMarkers['home']=homeM;
+  all.forEach(pid => {
+    const p = PLACES()[pid];
+    if (!p) return;
+    const isProg = d.places.includes(pid);
+    const bg = isProg?'#1d3557':'#8b4513';
+    const m = L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:`<div style="background:${bg};color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:17px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)">${p.icon}</div>`,iconSize:[36,36],iconAnchor:[18,18]})});
+    m.addTo(map);
+    m.on('click',()=>showMapInfo(pid));
+    mapMarkers[pid]=m;
+  });
+  const coords = all.map(pid=>PLACES()[pid]?[PLACES()[pid].lat,PLACES()[pid].lng]:null).filter(Boolean);
+  coords.push([HOME.lat,HOME.lng]);
+  if (coords.length>1) map.fitBounds(L.latLngBounds(coords),{padding:[40,40]});
+}
+
+function showMapInfo(pid) {
+  const p = PLACES()[pid];
+  const ui = L();
+  const info = document.getElementById('map-info');
+  document.getElementById('map-info-name').textContent = p.icon+' '+p.name;
+  document.getElementById('map-info-desc').textContent = p.desc.substring(0,120)+'...';
+  document.getElementById('map-info-actions').innerHTML = `<a class="map-btn primary" href="${mapsUrl(p.lat,p.lng,p.name)}" target="_blank">${ui.l.openInMaps}</a><button class="map-btn secondary" onclick="hideMapInfo()">${ui.l.close}</button>`;
+  info.style.display = 'block';
+}
+function hideMapInfo(){ document.getElementById('map-info').style.display='none'; }
+
+function locateUser() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos => {
+    userLat=pos.coords.latitude; userLng=pos.coords.longitude;
+    if (userMarker) map.removeLayer(userMarker);
+    userMarker = L.circleMarker([userLat,userLng],{radius:8,fillColor:'#2196F3',fillOpacity:1,color:'#fff',weight:2}).addTo(map);
+    map.setView([userLat,userLng],16);
+    renderPlaces();
+  }, err=>alert('Не удалось получить геолокацию'));
+}
+
+// ── TOGGLE ────────────────────────────────────────────────────────────────────
+function toggleCard(bodyId,arrowId) {
+  const body=document.getElementById(bodyId);
+  const arrow=document.getElementById(arrowId);
+  if (!body) return;
+  const isOpen=body.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open',isOpen);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(tab) {
+  activeTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('nb-'+tab).classList.add('active');
+  if (tab==='map') { if (!map) initMap(); setTimeout(()=>{map.invalidateSize();updateMapMarkers();},100); }
+}
+
+function switchDay(id) {
+  currentDayId=id;
+  renderHeader();
+  renderToday();
+  renderPlaces();
+  renderScripture();
+  if (activeTab==='map') updateMapMarkers();
+}
+
+function switchLang(lang) {
+  currentLang=lang;
+  document.getElementById('btn-ru').classList.toggle('active',lang==='ru');
+  document.getElementById('btn-ro').classList.toggle('active',lang==='ro');
+  renderHeader();
+  renderToday();
+  renderPlaces();
+  renderScripture();
+  if (activeTab==='map') updateMapMarkers();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+currentDayId=getCurrentDayId();
+renderHeader();
+renderToday();
+renderPlaces();
+renderScripture();
+</script>
+</body>
+</html>
