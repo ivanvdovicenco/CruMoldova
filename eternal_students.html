@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1d3557">
+<meta property="og:title" content="Вечные студенты · Cru Moldova">
+<meta property="og:description" content="Учиться, расти и идти рядом со студентами — всегда.">
+<meta property="og:image" content="img/eternal_students.jpg">
+<title>Вечные студенты · Cru Moldova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f0e8;--card:#fefcf8;--card2:#f0ebe0;
+  --blue:#1d3557;--blue-l:#e8eef5;
+  --terra:#8b2e2e;--terra-l:#f5e3dc;
+  --text:#1a1410;--t2:#5a4f42;--t3:#9a8e80;
+  --border:#ddd5c5;
+  --sh:0 10px 40px rgba(29,53,87,.14);
+  --ff-head:'Cormorant Garamond',Georgia,serif;
+  --ff-body:'Jost',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#14181f;--card:#1c222c;--card2:#232a36;
+    --blue:#9fb8d9;--blue-l:#24344a;
+    --terra:#e09a8a;--terra-l:#3a2522;
+    --text:#ece6dc;--t2:#c2b8a8;--t3:#8a8072;
+    --border:#2e3644;
+    --sh:0 10px 40px rgba(0,0,0,.45);
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--ff-body);background:var(--bg);color:var(--text);font-size:16px;line-height:1.65;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:40px 16px 64px}
+
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);text-align:center}
+h1{font-family:var(--ff-head);font-weight:600;font-size:clamp(40px,9vw,64px);line-height:1.05;text-align:center;color:var(--blue);margin:10px 0 6px}
+.sub{font-family:var(--ff-head);font-style:italic;font-size:20px;color:var(--t2);text-align:center}
+
+/* stripes echo the sweater in the photo */
+.stripes{height:10px;max-width:160px;margin:22px auto 34px;
+  background:repeating-linear-gradient(90deg,var(--terra) 0 10px,transparent 10px 20px)}
+
+.polaroid{background:var(--card);padding:14px 14px 18px;border-radius:6px;box-shadow:var(--sh);
+  max-width:520px;margin:0 auto;transform:rotate(-1.2deg);transition:transform .35s ease}
+.polaroid:hover{transform:rotate(0) scale(1.01)}
+.polaroid img{display:block;width:100%;height:auto;border-radius:3px;aspect-ratio:3/4;object-fit:cover;background:var(--card2)}
+.polaroid figcaption{font-family:var(--ff-head);font-style:italic;font-size:19px;text-align:center;color:var(--t2);margin-top:12px}
+
+.text{margin:44px auto 0;max-width:600px}
+.text p{margin-bottom:16px;color:var(--t2)}
+.text p strong{color:var(--text);font-weight:500}
+
+.verse{margin:36px auto 0;max-width:600px;background:var(--terra-l);border-left:3px solid var(--terra);
+  padding:20px 22px;border-radius:0 12px 12px 0}
+.verse q{font-family:var(--ff-head);font-size:21px;line-height:1.45;color:var(--text);quotes:"«" "»"}
+.verse cite{display:block;margin-top:8px;font-style:normal;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--terra)}
+
+.marks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:36px auto 0;max-width:600px}
+.mark{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 12px;text-align:center}
+.mark b{display:block;font-family:var(--ff-head);font-size:22px;font-weight:600;color:var(--blue)}
+.mark span{font-size:13px;color:var(--t3)}
+@media (max-width:480px){.marks{grid-template-columns:1fr}}
+
+footer{text-align:center;margin-top:48px;font-size:13px;color:var(--t3);letter-spacing:.04em}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">Cru Moldova · 6 октября 2026</div>
+  <h1>Вечные студенты</h1>
+  <p class="sub">Studenți pentru totdeauna</p>
+  <div class="stripes" aria-hidden="true"></div>
+
+  <figure class="polaroid">
+    <img src="img/eternal_students.jpg" alt="Двое сотрудников Cru Moldova улыбаются на фоне лестницы в студенческом центре" width="1200" height="1600" loading="eager">
+    <figcaption>Диплом уже давно получен, а мы всё ещё на кампусе.</figcaption>
+  </figure>
+
+  <section class="text">
+    <p>Сессии давно позади, зачётки пылятся где-то на полке — а мы всё равно каждую неделю возвращаемся туда, где студенты. Потому что <strong>учиться не заканчивается никогда</strong>: у Бога, друг у друга и у тех, кто только начинает свой путь.</p>
+    <p>Быть «вечным студентом» в Cru — значит оставаться рядом: задавать вопросы и слушать ответы, пить чай после встреч, вместе открывать Библию и вместе удивляться тому, как Бог меняет жизни.</p>
+    <p>Лекции меняются, аудитории меняются, поколения меняются. <strong>Призвание — нет.</strong></p>
+  </section>
+
+  <blockquote class="verse">
+    <q>И что слышал от меня при многих свидетелях, то передай верным людям, которые были бы способны и других научить.</q>
+    <cite>2 Тимофею 2:2</cite>
+  </blockquote>
+
+  <div class="marks">
+    <div class="mark"><b>Учимся</b><span>каждый день</span></div>
+    <div class="mark"><b>Служим</b><span>студентам</span></div>
+    <div class="mark"><b>Передаём</b><span>дальше</span></div>
+  </div>
+
+  <footer>Cru Moldova · Space</footer>
+</main>
+</body>
+</html>
