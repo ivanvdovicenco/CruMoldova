@@ -1,56 +1,77 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ro">
 <head>
 <meta charset="UTF-8">
-<title>Вечные студенты · пост</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800;900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<title>Studenți pentru totdeauna · Studentify</title>
+<!-- Studentify brand: Poppins only; colours from GHID DE IDENTITATE STUDENTIFY -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+:root{
+  --lochmara:#037AC7;   /* primary */
+  --supernova:#FFCF01;  /* primary */
+  --treepoppy:#F7941D;  /* primary */
+  --aquaforest:#569374; /* primary */
+  --viking:#7BC7DB;     /* secondary */
+  --illusion:#F6B1CF;   /* secondary */
+  --apricot:#FDD5C0;    /* secondary */
+  --persimmon:#FF7352;  /* secondary */
+}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:#222}
-.post{width:1080px;height:1350px;position:relative;overflow:hidden;
-  background:#fff6e8;font-family:'Unbounded',sans-serif;color:#1b1b2f}
-/* stripes like the sweater */
-.post::before{content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(0deg,transparent 0 58px,rgba(139,30,45,.07) 58px 80px)}
-.top{position:absolute;top:56px;left:64px;right:64px;display:flex;justify-content:space-between;align-items:center}
-.tag{background:#1b1b2f;color:#fff6e8;font-weight:600;font-size:24px;padding:12px 24px;border-radius:40px;letter-spacing:.02em}
-.issue{font-weight:600;font-size:22px;color:#8b1e2d}
-h1{position:absolute;top:140px;left:56px;right:56px;font-weight:900;font-size:128px;line-height:.92;letter-spacing:-.03em;text-transform:uppercase}
-h1 .l2{color:#8b1e2d;display:block}
-h1 .inf{display:inline-block;background:#ffd23f;color:#1b1b2f;border-radius:24px;padding:0 18px;margin-left:22px;transform:rotate(-6deg) translateY(-8px);font-size:100px;line-height:1.1;vertical-align:middle}
-.photo{position:absolute;left:150px;top:470px;width:600px;height:780px;background:#fff;padding:18px 18px 70px;
-  box-shadow:0 24px 60px rgba(27,27,47,.28);transform:rotate(-3deg)}
-.photo img{width:100%;height:100%;object-fit:cover;object-position:50% 70%}
-.photo .cap{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-family:'Caveat',cursive;font-size:44px;color:#1b1b2f}
-.tape{position:absolute;width:170px;height:46px;background:rgba(255,210,63,.75);top:-20px;left:50%;transform:translateX(-50%) rotate(4deg)}
-.sticker{position:absolute;font-weight:800;font-size:26px;padding:16px 22px;border-radius:18px;border:4px solid #1b1b2f;box-shadow:6px 6px 0 #1b1b2f;line-height:1.2}
-.s1{top:520px;right:52px;background:#7fd6c2;transform:rotate(6deg)}
-.s2{top:720px;right:70px;background:#ff8fa3;transform:rotate(-5deg)}
-.s3{top:920px;right:44px;background:#ffd23f;transform:rotate(4deg)}
-.sticker small{display:block;font-weight:600;font-size:18px;opacity:.75}
-.hand{position:absolute;right:60px;bottom:150px;width:250px;font-family:'Caveat',cursive;font-size:46px;line-height:1;color:#8b1e2d;transform:rotate(-6deg);text-align:center}
-.bottom{position:absolute;left:0;right:0;bottom:0;height:96px;background:#1b1b2f;color:#fff6e8;
-  display:flex;align-items:center;justify-content:space-between;padding:0 64px;font-weight:600;font-size:24px}
-.bottom b{color:#ffd23f;font-weight:800}
+html,body{background:#ddd}
+.post{width:1080px;height:1350px;position:relative;overflow:hidden;background:var(--lochmara);
+  font-family:'Poppins',sans-serif;color:#fff}
+/* flat geometric shapes */
+.c1{position:absolute;width:520px;height:520px;border-radius:50%;background:var(--supernova);right:-170px;top:-190px}
+.c2{position:absolute;width:300px;height:300px;border-radius:50%;background:var(--viking);left:-120px;bottom:210px}
+.c3{position:absolute;width:150px;height:150px;border-radius:50%;background:var(--treepoppy);right:70px;bottom:250px}
+
+.logo{position:absolute;top:64px;left:72px;font-weight:700;font-size:44px;letter-spacing:-.02em;color:#fff}
+.handle{position:absolute;top:80px;right:84px;font-weight:600;font-size:24px;color:var(--lochmara)}
+
+.kicker{position:absolute;top:190px;left:72px;font-weight:600;font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--supernova)}
+h1{position:absolute;top:236px;left:68px;font-weight:800;font-size:104px;line-height:1;letter-spacing:-.035em}
+h1 .hl{background:var(--supernova);color:var(--lochmara);padding:0 18px;border-radius:20px;display:inline-block;margin-top:10px}
+
+.photo{position:absolute;left:72px;top:500px;width:600px;height:690px;border-radius:40px;overflow:hidden;border:10px solid #fff}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:50% 72%}
+
+.facts{position:absolute;left:712px;top:530px;width:300px;display:flex;flex-direction:column;gap:22px}
+.fact{background:#fff;color:#1d1d1b;border-radius:28px;padding:22px 26px}
+.fact small{display:block;font-weight:500;font-size:20px;color:#6b6b6b}
+.fact b{display:block;font-weight:700;font-size:30px;line-height:1.2}
+.fact.y{background:var(--supernova)}
+.fact.g{background:var(--aquaforest);color:#fff}.fact.g small{color:rgba(255,255,255,.8)}
+
+.bar{position:absolute;left:0;right:0;bottom:0;height:120px;background:#fff;color:var(--lochmara);
+  display:flex;align-items:center;justify-content:space-between;padding:0 72px}
+.bar .pillars{font-weight:700;font-size:30px}
+.bar .pillars span{color:var(--treepoppy)}
+.bar .ref{font-weight:600;font-size:22px;color:#6b6b6b}
 </style>
 </head>
 <body>
 <div class="post" id="post">
-  <div class="top"><span class="tag">#studentify</span><span class="issue">Cru Moldova</span></div>
-  <h1>Вечные<span class="inf">∞</span><span class="l2">студенты</span></h1>
+  <div class="c1"></div><div class="c2"></div><div class="c3"></div>
 
-  <div class="photo">
-    <div class="tape"></div>
-    <img src="../img/eternal_students.jpg" alt="">
-    <div class="cap">курс: бесконечный 🤓</div>
+  <!-- TODO: înlocuiește cu sigla oficială studentify (versiunea albă, fără efecte) -->
+  <div class="logo">studentify</div>
+  <div class="handle">@studentify.md</div>
+
+  <div class="kicker">Echipa noastră</div>
+  <h1>Studenți<br><span class="hl">pentru totdeauna</span></h1>
+
+  <div class="photo"><img src="../img/eternal_students.jpg" alt=""></div>
+
+  <div class="facts">
+    <div class="fact"><small>Sesiunea</small><b>închisă ✓</b></div>
+    <div class="fact y"><small>Diploma</small><b>luată ✓</b></div>
+    <div class="fact g"><small>Campusul</small><b>nu ne lasă 😄</b></div>
   </div>
 
-  <div class="sticker s1"><small>сессия</small>закрыта ✅</div>
-  <div class="sticker s2"><small>диплом</small>получен 🎓</div>
-  <div class="sticker s3"><small>кампус</small>не отпускает 😅</div>
-  <div class="hand">учимся у Бога, друг у друга и у вас ↓</div>
-
-  <div class="bottom"><span>Учимся. Служим. <b>Передаём дальше.</b></span><span>2 Тим 2:2</span></div>
+  <div class="bar">
+    <div class="pillars">Mentorare <span>•</span> Dezvoltare <span>•</span> Comunitate</div>
+    <div class="ref">2 Timotei 2:2</div>
+  </div>
 </div>
 </body>
 </html>

@@ -1,4 +1,20 @@
-# Вечные студенты — подпись к посту
+# Studenți pentru totdeauna — text pentru postare (Studentify)
+
+## RO (principal)
+
+Studenți pentru totdeauna ∞🎓
+
+Sesiunea e închisă ✅ Diploma e luată ✅ Dar campusul tot nu ne lasă 😅
+
+Am rămas studenți, doar că acum învățăm de la Dumnezeu, unii de la alții și de la voi. În fiecare săptămână ne întoarcem acolo unde sunt studenții: cu întrebări, discuții la un ceai, cu Biblia și cu povești despre cum Dumnezeu schimbă vieți.
+
+Cursurile se schimbă, sălile se schimbă, generațiile se schimbă. Chemarea rămâne aceeași 💛
+
+„…încredințează la oameni de încredere, care să fie în stare să învețe și pe alții” (2 Timotei 2:2)
+
+👇 Tu în ce an ești? Scrie în comentarii!
+
+#studentify @studentify.md #CruMoldova #studentipentrutotdeauna #studenti #Chisinau #campus
 
 ## RU
 
@@ -15,19 +31,3 @@
 👇 А ты на каком курсе? Пиши в комментариях!
 
 #studentify #CruMoldova #вечныестуденты #студенты #Кишинёв #кампус
-
-## RO
-
-Studenți pentru totdeauna ∞🎓
-
-Sesiunea e închisă ✅ Diploma e luată ✅ Dar campusul tot nu ne lasă 😅
-
-Am rămas studenți, doar că acum învățăm de la Dumnezeu, unii de la alții și de la voi. În fiecare săptămână ne întoarcem acolo unde sunt studenții: cu întrebări, discuții la un ceai, cu Biblia și cu povești despre cum Dumnezeu schimbă vieți.
-
-Cursurile se schimbă, sălile se schimbă, generațiile se schimbă. Chemarea rămâne aceeași 💛
-
-„…încredințează la oameni de încredere, care să fie în stare să învețe și pe alții” (2 Timotei 2:2)
-
-👇 Tu în ce an ești? Scrie în comentarii!
-
-#studentify #CruMoldova #studentipentrutotdeauna #studenti #Chisinau #campus
