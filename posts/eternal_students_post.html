@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Вечные студенты · пост</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800;900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#222}
+.post{width:1080px;height:1350px;position:relative;overflow:hidden;
+  background:#fff6e8;font-family:'Unbounded',sans-serif;color:#1b1b2f}
+/* stripes like the sweater */
+.post::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent 0 58px,rgba(139,30,45,.07) 58px 80px)}
+.top{position:absolute;top:56px;left:64px;right:64px;display:flex;justify-content:space-between;align-items:center}
+.tag{background:#1b1b2f;color:#fff6e8;font-weight:600;font-size:24px;padding:12px 24px;border-radius:40px;letter-spacing:.02em}
+.issue{font-weight:600;font-size:22px;color:#8b1e2d}
+h1{position:absolute;top:140px;left:56px;right:56px;font-weight:900;font-size:128px;line-height:.92;letter-spacing:-.03em;text-transform:uppercase}
+h1 .l2{color:#8b1e2d;display:block}
+h1 .inf{display:inline-block;background:#ffd23f;color:#1b1b2f;border-radius:24px;padding:0 18px;margin-left:22px;transform:rotate(-6deg) translateY(-8px);font-size:100px;line-height:1.1;vertical-align:middle}
+.photo{position:absolute;left:150px;top:470px;width:600px;height:780px;background:#fff;padding:18px 18px 70px;
+  box-shadow:0 24px 60px rgba(27,27,47,.28);transform:rotate(-3deg)}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:50% 70%}
+.photo .cap{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-family:'Caveat',cursive;font-size:44px;color:#1b1b2f}
+.tape{position:absolute;width:170px;height:46px;background:rgba(255,210,63,.75);top:-20px;left:50%;transform:translateX(-50%) rotate(4deg)}
+.sticker{position:absolute;font-weight:800;font-size:26px;padding:16px 22px;border-radius:18px;border:4px solid #1b1b2f;box-shadow:6px 6px 0 #1b1b2f;line-height:1.2}
+.s1{top:520px;right:52px;background:#7fd6c2;transform:rotate(6deg)}
+.s2{top:720px;right:70px;background:#ff8fa3;transform:rotate(-5deg)}
+.s3{top:920px;right:44px;background:#ffd23f;transform:rotate(4deg)}
+.sticker small{display:block;font-weight:600;font-size:18px;opacity:.75}
+.hand{position:absolute;right:60px;bottom:150px;width:250px;font-family:'Caveat',cursive;font-size:46px;line-height:1;color:#8b1e2d;transform:rotate(-6deg);text-align:center}
+.bottom{position:absolute;left:0;right:0;bottom:0;height:96px;background:#1b1b2f;color:#fff6e8;
+  display:flex;align-items:center;justify-content:space-between;padding:0 64px;font-weight:600;font-size:24px}
+.bottom b{color:#ffd23f;font-weight:800}
+</style>
+</head>
+<body>
+<div class="post" id="post">
+  <div class="top"><span class="tag">#studentify</span><span class="issue">Cru Moldova</span></div>
+  <h1>Вечные<span class="inf">∞</span><span class="l2">студенты</span></h1>
+
+  <div class="photo">
+    <div class="tape"></div>
+    <img src="../img/eternal_students.jpg" alt="">
+    <div class="cap">курс: бесконечный 🤓</div>
+  </div>
+
+  <div class="sticker s1"><small>сессия</small>закрыта ✅</div>
+  <div class="sticker s2"><small>диплом</small>получен 🎓</div>
+  <div class="sticker s3"><small>кампус</small>не отпускает 😅</div>
+  <div class="hand">учимся у Бога, друг у друга и у вас ↓</div>
+
+  <div class="bottom"><span>Учимся. Служим. <b>Передаём дальше.</b></span><span>2 Тим 2:2</span></div>
+</div>
+</body>
+</html>
